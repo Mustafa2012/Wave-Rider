@@ -28,15 +28,18 @@ body {
 
 
 #obstacle {
-  width: 50px;
-  height: 50px;
-  background: red;
+  width: 80px;
+  height: 100px;
+  background-image: url('Coral.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   position: absolute;
   bottom: 60px;
-  left: 50%; /* Start at center */
-  transform: translateX(-50%); /* Center the element itself */
+  left: 50vw; 
   z-index: 1;
 }
+
 
 
 
