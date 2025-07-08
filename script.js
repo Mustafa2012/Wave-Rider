@@ -1,5 +1,4 @@
 const player = document.getElementById("player");
-const obstacle = document.getElementById("obstacle");
 const scoreEl = document.getElementById("score");
 const wavePath = document.getElementById("wave-path");
 
@@ -85,18 +84,6 @@ function animateChurningWave() {
 }
 
 
-
-const obstacleX = obstacle.getBoundingClientRect().left / window.innerWidth * width;
-const i = Math.floor((obstacleX / width) * segments);
-const waveYObstacle =
-  height / 2 +
-  Math.sin(t + i * 0.5) * 5 +
-  Math.cos(t * 0.7 + i) * 3;
-
-obstacle.style.bottom = `${waveYObstacle - 24}px`; 
-
-
-
   requestAnimationFrame(animateChurningWave);
 }
 
@@ -169,33 +156,125 @@ function startGame() {
   isGameStarted = true;
   startMessage.style.display = "none";
 
-  moveObstacle();         
+  spawnObstacles();      
+  moveObstacles();       
 
   gameLoop = setInterval(() => {
     if (gameOver) return;
 
-    const playerRect = player.getBoundingClientRect();
-    const obstacleRect = obstacle.getBoundingClientRect();
+    const playerPoly = getPlayerPolygon(player);
 
-    function checkPolygonCollision(playerEl, obstacleEl) {
-      const playerPoly = getPlayerPolygon(playerEl);
-      const coralPoly = getCoralPolygon(obstacleEl);
-
+    for (let obj of activeObstacles) {
+      const coralPoly = getCoralPolygon(obj.el);
       const response = new SAT.Response();
-      return SAT.testPolygonPolygon(playerPoly, coralPoly, response);
+      if (SAT.testPolygonPolygon(playerPoly, coralPoly, response)) {
+        alert("Game Over! Score: " + score);
+        gameOver = true;
+        clearInterval(gameLoop);
+        location.reload();
+        return;
+      }
     }
 
-    if (checkPolygonCollision(player, obstacle)) {
-      alert("Game Over! Score: " + score);
-      gameOver = true;
-      clearInterval(gameLoop);
-      location.reload();
-    } else {
-      score++;
-      scoreEl.textContent = "Score: " + score;
-    }
+    score++;
+    scoreEl.textContent = "Score: " + score;
   }, 50);
 }
 
+const clouds = Array.from(document.querySelectorAll('.cloud'));
+const cloudSpeeds = [0.3, 0.2, 0.25, 0.15, 0.1];
+
+let cloudPositions = clouds.map(cloud => {
+  return {
+    x: parseFloat(cloud.style.left),
+    y: parseFloat(cloud.style.top),
+    speed: 0.2
+  };
+});
+
+
+function moveClouds() {
+  clouds.forEach((cloud, i) => {
+    let pos = cloudPositions[i];
+    pos.x += pos.speed;
+
+    if (pos.x > window.innerWidth + 200) {
+      pos.x = -200; // wrap from left
+    }
+
+    cloud.style.left = `${pos.x}px`;
+    cloud.style.top = `${pos.y}px`;
+  });
+
+  requestAnimationFrame(moveClouds);
+}
+
+
+
+const obstacleTypes = [
+  {
+    width: 50,
+    height: 70,
+    image: "coral1.png",
+    bottom: 12
+  },
+  {
+    width: 90,
+    height: 60,
+    image: "coral2.png",
+    bottom: 15
+  },
+  {
+    width: 100,
+    height: 87,
+    image: "coral3.png",
+    bottom: 0.1
+  }
+];
+
+function createObstacle() {
+  const container = document.getElementById("obstacles-container");
+  const type = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+
+  const obstacle = document.createElement("div");
+  obstacle.classList.add("obstacle");
+  obstacle.style.width = `${type.width}px`;
+  obstacle.style.height = `${type.height}px`;
+  obstacle.style.left = `${window.innerWidth}px`;
+  obstacle.style.bottom = `${type.bottom}px`;
+  obstacle.style.backgroundImage = `url(${type.image})`;
+
+  container.appendChild(obstacle);
+  return obstacle;
+}
+
+let activeObstacles = [];
+
+function spawnObstacles() {
+  setInterval(() => {
+    if (gameOver || !isGameStarted) return;
+    const newObstacle = createObstacle();
+    activeObstacles.push({ el: newObstacle, x: window.innerWidth });
+  }, 2000);
+}
+
+function moveObstacles() {
+  const speed = window.innerWidth / 2000 * 20;
+
+  activeObstacles.forEach((obj, index) => {
+    obj.x -= speed;
+    obj.el.style.left = `${obj.x}px`;
+
+    if (obj.x < -200) {
+      obj.el.remove();
+      activeObstacles.splice(index, 1);
+    }
+  });
+
+  requestAnimationFrame(moveObstacles);
+}
+
+
+moveClouds();
 
 

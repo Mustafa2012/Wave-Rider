@@ -1,26 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dino Runner</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div id="obstacles-container"></div>
   <div class="game">
+    <div class="clouds">
+  <div class="cloud cloud1"></div>
+  <div class="cloud cloud2"></div>
+  <div class="cloud cloud3"></div>
+  <div class="cloud cloud4"></div>
+  <div class="cloud cloud5"></div>
+</div>
+<div class="fish-container">
+  <div class="fish"></div>
+</div>
     <div id="player"></div>
     <div id="obstacle"></div>
     <div id="start-message">Press Space to Start</div>
-    <div id="score">Score: 0</div>
-    <div class="sea">
-  <svg viewBox="0 0 120 60" preserveAspectRatio="none">
-    <circle class="wave-part" cx="10" cy="30" r="10" />
-    <circle class="wave-part" cx="30" cy="32" r="10" />
-    <circle class="wave-part" cx="50" cy="29" r="10" />
-    <circle class="wave-part" cx="70" cy="31" r="10" />
-    <circle class="wave-part" cx="90" cy="30" r="10" />
-    <circle class="wave-part" cx="110" cy="28" r="10" />
-  </svg>
+    <div id="score">Score: 0
+    </div>
 </div>
 <div class="sea">
   <svg id="sea-svg" viewBox="0 0 120 60" preserveAspectRatio="none">

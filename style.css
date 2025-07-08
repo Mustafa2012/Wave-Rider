@@ -27,17 +27,20 @@ body {
 
 
 
-#obstacle {
-  width: 80px;
-  height: 100px;
-  background-image: url('Coral.png');
+#obstacles-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.obstacle {
+  position: absolute;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  position: absolute;
-  bottom: 60px;
-  left: 50vw; 
-  z-index: 1;
 }
 
 
@@ -77,14 +80,71 @@ body {
 
 #start-message {
   position: absolute;
-  top: 50%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 32px;
-  color: white;
-  background: rgba(0, 0, 0, 0.6);
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #ffffff;
+  background: rgba(0, 0, 50, 0.6);
   padding: 20px 40px;
-  border-radius: 10px;
-  z-index: 10;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0, 200, 255, 0.7);
+  animation: pulse 2s infinite ease-in-out;
+  font-family: 'Orbitron', sans-serif; 
+  letter-spacing: 2px;
+  z-index: 1000;
 }
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(0, 200, 255, 1);
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+
+.clouds {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 150px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.cloud {
+  position: absolute;
+  background: #dfdfdf;
+  border-radius: 50%;
+  opacity: 0.8;
+  width: 100px;
+  height: 60px;
+  box-shadow:
+    30px 10px 0 #dfdfdf,
+    60px 0 0 #dfdfdf,
+    90px 10px 0 #dfdfdf;
+}
+
+.cloud1 { top: 60px; left: 100px; animation-delay: 0s; }
+.cloud2 { top: 10px; left: 300px; animation-delay: 0s; transform: scale(0.8); }
+.cloud3 { top: 10px; left: 700px; animation-delay: 0s; transform: scale(1.1); }
+.cloud4 { top: 60px; left: 900px; animation-delay: 0s; transform: scale(0.9); }
+.cloud5 { top: 60px; left: 500px; animation-delay: 0s; transform: scale(1.2); }
+
+@keyframes moveCloud {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(100vw); }
+}
+
 
