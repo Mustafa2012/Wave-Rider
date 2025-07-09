@@ -2,6 +2,12 @@ const player = document.getElementById("player");
 const scoreEl = document.getElementById("score");
 const wavePath = document.getElementById("wave-path");
 
+const jumpSound = new Audio("jump.mp3");
+const splashSound = new Audio("splash.wav");
+const scoreSound = new Audio("score.mp3");
+const gameOverSound = new Audio("gameover.mp3");
+
+
 let isJumping = false;
 let isGameStarted = false;
 const startMessage = document.getElementById("start-message");
@@ -15,44 +21,80 @@ const segments = 40;
 document.addEventListener("keydown", function (e) {
   if (e.code === "Space") {
     if (!isGameStarted) {
+      splashSound.load(); // prepare sound
       startGame();
-    } else if (!isJumping && !gameOver) {
-      jump();
+    } else if (!gameOver) {
+      jump(); 
     }
   }
 });
 
 
+
+let upInterval = null;
+let downInterval = null;
+
 function jump() {
-  isJumping = true;
   let position = parseInt(player.style.bottom) || 60;
-  const maxJump = position + 250;
 
   
-  let upInterval = setInterval(() => {
-    if (position >= maxJump) {
-      clearInterval(upInterval);
+  if (!isJumping) {
+    isJumping = true;
+    const maxJump = position + 250;
 
-      
-      let downInterval = setInterval(() => {
-        const waveY = getWaveYAtPlayer();
-        if (position <= waveY) {
-          clearInterval(downInterval);
-          isJumping = false;
-        } else {
-          position -= 15;
-          player.style.bottom = position + "px";
-        }
-      }, 20);
-    } else {
-      position += 15;
-      player.style.bottom = position + "px";
-    }
-  }, 20);
+    clearInterval(upInterval);
+    clearInterval(downInterval);
+
+    upInterval = setInterval(() => {
+      if (position >= maxJump) {
+        clearInterval(upInterval);
+        startFall(position);
+      } else {
+        position += 15;
+        player.style.bottom = position + "px";
+      }
+    }, 20);
+  } else {
+    
+    if (upInterval) clearInterval(upInterval);
+    if (downInterval) clearInterval(downInterval);
+    startFall(parseInt(player.style.bottom) || 60, true); // true = slam
+  }
 }
 
+function startFall(startPos, slam = false) {
+  let position = startPos;
+  const fallSpeed = slam ? 700 : 1500;
+
+ let downInterval = setInterval(() => {
+  const waveY = getWaveYAtPlayer();
+  if (position <= waveY) {
+    clearInterval(downInterval);
+    isJumping = false;
+    player.style.bottom = (waveY - 30) + "px"; 
+
+    if (slam) {
+        const rect = player.getBoundingClientRect();
+const playerX = rect.left + rect.width / 2;  
+const playerY = rect.bottom;                  
+triggerSplash(playerX, playerY);
+splashSound.currentTime = 0;
+splashSound.play();
+
+
+
+    }
+  } else {
+    position -= 15;
+    player.style.bottom = position + "px";
+  }
+}, 20);
+
+}
+
+
 function getWaveYAtPlayer(t = Date.now() / 500) {
-  const playerX = 50 / window.innerWidth * width; // 50px is player left
+  const playerX = 50 / window.innerWidth * width; 
   const i = Math.floor((playerX / width) * segments);
   return (
     height / 2 +
@@ -176,6 +218,13 @@ function startGame() {
       }
     }
 
+if (score > highScore) {
+  highScore = score;
+  localStorage.setItem("highScore", highScore);
+  document.getElementById("high-score").textContent = "High Score: " + highScore;
+}
+
+
     score++;
     scoreEl.textContent = "Score: " + score;
   }, 50);
@@ -199,7 +248,7 @@ function moveClouds() {
     pos.x += pos.speed;
 
     if (pos.x > window.innerWidth + 200) {
-      pos.x = -200; // wrap from left
+      pos.x = -200; 
     }
 
     cloud.style.left = `${pos.x}px`;
@@ -251,12 +300,27 @@ function createObstacle() {
 let activeObstacles = [];
 
 function spawnObstacles() {
-  setInterval(() => {
+  let minDelay = 1200;  
+  let maxDelay = 3000;  
+  const difficultyIncreaseRate = 0.98;
+
+  function spawn() {
     if (gameOver || !isGameStarted) return;
+
     const newObstacle = createObstacle();
     activeObstacles.push({ el: newObstacle, x: window.innerWidth });
-  }, 2000);
+
+    
+    minDelay = Math.max(500, minDelay * difficultyIncreaseRate);
+    maxDelay = Math.max(minDelay + 300, maxDelay * difficultyIncreaseRate);
+
+    const nextDelay = Math.random() * (maxDelay - minDelay) + minDelay;
+    setTimeout(spawn, nextDelay);
+  }
+
+  spawn(); 
 }
+
 
 function moveObstacles() {
   const speed = window.innerWidth / 2000 * 20;
@@ -277,4 +341,53 @@ function moveObstacles() {
 
 moveClouds();
 
+function triggerSplash() {
+  const container = document.getElementById("splash-container");
+  const playerRect = player.getBoundingClientRect();
+  const startX = playerRect.left + playerRect.width / 2;
+  const startY = playerRect.bottom - 10;
 
+  for (let i = 0; i < 20; i++) {
+    const particle = document.createElement("div");
+    particle.classList.add("splash-particle");
+
+    const size = Math.random() * 10 + 8;
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+
+    // Start position
+    particle.style.left = `${startX}px`;
+    particle.style.top = `${startY}px`;
+
+    // Initial velocity
+    const angle = Math.random() * Math.PI - Math.PI / 2;
+    const speed = Math.random() * 5 + 2;
+    let vx = Math.cos(angle) * speed;
+    let vy = Math.sin(angle) * speed;
+
+    let x = startX;
+    let y = startY;
+    let gravity = 0.4;
+
+    function animate() {
+      vy += gravity;
+      x += vx;
+      y += vy;
+
+      particle.style.left = `${x}px`;
+      particle.style.top = `${y}px`;
+
+      if (parseFloat(particle.style.opacity) <= 0) {
+        particle.remove();
+      } else {
+        requestAnimationFrame(animate);
+      }
+    }
+
+    container.appendChild(particle);
+    animate();
+  }
+}
+
+let highScore = localStorage.getItem("highScore") || 0;
+document.getElementById("high-score").textContent = "High Score: " + highScore;

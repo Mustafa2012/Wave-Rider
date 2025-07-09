@@ -148,3 +148,61 @@ body {
 }
 
 
+
+#splash-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.splash-particle {
+  position: absolute;
+  background-color: rgba(3, 112, 148, 0.685);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(6, 115, 151, 0.76);
+  opacity: 1;
+  transform: scale(1);
+  animation: splash-fade 1s forwards;
+}
+
+@keyframes splash-fade {
+  to {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+
+
+#high-score {
+  position: fixed;
+  top: 20px;
+  right: 30px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 8px 12px;
+  border-radius: 8px;
+  z-index: 1000;
+ font-family: 'Freckle Face', cursive;
+}
+
+
+#score {
+  position: fixed;
+  top: 20px;
+  left: 30px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 8px 12px;
+  border-radius: 8px;
+  z-index: 1000;
+ font-family: 'Freckle Face', cursive;
+}
+
+
