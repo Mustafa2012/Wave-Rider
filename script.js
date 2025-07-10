@@ -2,10 +2,14 @@ const player = document.getElementById("player");
 const scoreEl = document.getElementById("score");
 const wavePath = document.getElementById("wave-path");
 
-const jumpSound = new Audio("jump.mp3");
+const jumpSound = new Audio("jump.wav");
 const splashSound = new Audio("splash.wav");
 const scoreSound = new Audio("score.mp3");
-const gameOverSound = new Audio("gameover.mp3");
+const gameOverSound = new Audio("gameover.wav");
+const backgroundMusic = new Audio("background.wav");
+backgroundMusic.loop = true;         
+backgroundMusic.volume = 0.3;        
+
 
 
 let isJumping = false;
@@ -21,7 +25,10 @@ const segments = 40;
 document.addEventListener("keydown", function (e) {
   if (e.code === "Space") {
     if (!isGameStarted) {
-      splashSound.load(); // prepare sound
+      splashSound.load();
+      jumpSound.load();
+      backgroundMusic.load();
+      gameOverSound.load();
       startGame();
     } else if (!gameOver) {
       jump(); 
@@ -40,6 +47,9 @@ function jump() {
   
   if (!isJumping) {
     isJumping = true;
+    jumpSound.currentTime = 0; 
+    jumpSound.play();
+
     const maxJump = position + 250;
 
     clearInterval(upInterval);
@@ -198,6 +208,8 @@ function startGame() {
   isGameStarted = true;
   startMessage.style.display = "none";
 
+   backgroundMusic.play();
+
   spawnObstacles();      
   moveObstacles();       
 
@@ -210,13 +222,18 @@ function startGame() {
       const coralPoly = getCoralPolygon(obj.el);
       const response = new SAT.Response();
       if (SAT.testPolygonPolygon(playerPoly, coralPoly, response)) {
-        alert("Game Over! Score: " + score);
-        gameOver = true;
-        clearInterval(gameLoop);
-        location.reload();
-        return;
-      }
+  gameOverSound.play();
+  clearInterval(gameLoop);
+  gameOver = true;
+
+  const name = prompt("Game Over! Enter your name:");
+  saveScore(name || "Anonymous", score);
+
+  setTimeout(() => location.reload(), 2000); // Optional restart
+  return;
+}
     }
+
 
 if (score > highScore) {
   highScore = score;
@@ -300,7 +317,7 @@ function createObstacle() {
 let activeObstacles = [];
 
 function spawnObstacles() {
-  let minDelay = 1200;  
+  let minDelay = 1500;  
   let maxDelay = 3000;  
   const difficultyIncreaseRate = 0.98;
 
@@ -391,3 +408,35 @@ function triggerSplash() {
 
 let highScore = localStorage.getItem("highScore") || 0;
 document.getElementById("high-score").textContent = "High Score: " + highScore;
+
+
+
+
+
+
+
+function saveScore(name, score) {
+  let leaderboard = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+
+  leaderboard.push({ name, score });
+
+  leaderboard.sort((a, b) => b.score - a.score);
+  leaderboard = leaderboard.slice(0, 5); // Top 5
+
+  localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+  updateLeaderboard();
+}
+
+function updateLeaderboard() {
+  const list = document.getElementById("leaderboard-list");
+  list.innerHTML = "";
+
+  const leaderboard = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+  leaderboard.forEach(entry => {
+    const li = document.createElement("li");
+    li.textContent = `${entry.name}: ${entry.score}`;
+    list.appendChild(li);
+  });
+}
+
+updateLeaderboard(); 
