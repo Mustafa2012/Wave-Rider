@@ -1,44 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dino Runner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+  
   <div id="leaderboard" class="leaderboard">
-  <h2>Leaderboard</h2>
-  <ul id="leaderboard-list"></ul>
-</div>
+    <h2>Leaderboard</h2>
+    <ul id="leaderboard-list"></ul>
+  </div>
+
+  
   <div id="obstacles-container"></div>
+
+  
   <div class="game">
     <div class="clouds">
-  <div class="cloud cloud1"></div>
-  <div class="cloud cloud2"></div>
-  <div class="cloud cloud3"></div>
-  <div class="cloud cloud4"></div>
-  <div class="cloud cloud5"></div>
-</div>
-<div class="fish-container">
-  <div class="fish"></div>
-</div>
+      <div class="cloud cloud1"></div>
+      <div class="cloud cloud2"></div>
+      <div class="cloud cloud3"></div>
+      <div class="cloud cloud4"></div>
+      <div class="cloud cloud5"></div>
+    </div>
+
+    <div class="fish-container">
+      <div class="fish"></div>
+    </div>
+
     <div id="player"></div>
-    
     <div id="obstacle"></div>
+
     <div id="start-message">Press Space to Start</div>
     <div id="score">Score: 0</div>
-<div id="high-score">High Score: 0</div>
-    </div>
-</div>
-<div id="splash-container"></div>
-<div class="sea">
-  <svg id="sea-svg" viewBox="0 0 120 60" preserveAspectRatio="none">
-    <path id="wave-path" fill="#1e90ff"></path>
-  </svg>
-</div>
-  <script src="script.js"></script>
+    <div id="high-score">High Score: 0</div>
+  </div>
+
+  
+  <div id="splash-container"></div>
+
+  <div class="sea">
+    <svg id="sea-svg" viewBox="0 0 120 60" preserveAspectRatio="none">
+      <path id="wave-path" fill="#1e90ff"></path>
+    </svg>
+  </div>
+
+  
+  <script type="module" src="script.js"></script>
+
+  
   <script src="https://cdn.jsdelivr.net/npm/sat@0.9.0/SAT.min.js"></script>
+
 </body>
 </html>

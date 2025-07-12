@@ -16,10 +16,17 @@ let isGameStarted = false;
 const startMessage = document.getElementById("start-message");
 let score = 0;
 let gameOver = false;
+let gameLoop = null;
+
+
 
 const width = 120;
 const height = 60;
 const segments = 40;
+
+
+
+
 
 document.addEventListener("keydown", function (e) {
   if (e.code === "Space") {
@@ -165,6 +172,8 @@ function moveObstacle() {
 
 
 
+
+
 function getCoralPolygon(obstacleEl) {
   const rect = obstacleEl.getBoundingClientRect();
   const x = rect.left;
@@ -188,19 +197,18 @@ function getCoralPolygon(obstacleEl) {
 
 function getPlayerPolygon(playerEl) {
   const rect = playerEl.getBoundingClientRect();
-  const x = rect.left;
-  const y = rect.top;
-
+  const offset = new SAT.Vector(rect.left, rect.top);
 
   const points = [
-    new SAT.Vector(x + 20, y + 10),
-    new SAT.Vector(x + 120, y + 10),
-    new SAT.Vector(x + 120, y + 140),
-    new SAT.Vector(x + 20, y + 140)
+    new SAT.Vector(20, 10),
+    new SAT.Vector(120, 10),
+    new SAT.Vector(120, 140),
+    new SAT.Vector(20, 140)
   ];
 
-  return new SAT.Polygon(new SAT.Vector(0, 0), points);
+  return new SAT.Polygon(offset, points);
 }
+
 
 
 function startGame() {
@@ -221,12 +229,15 @@ function startGame() {
       const coralPoly = getCoralPolygon(obj.el);
       const response = new SAT.Response();
       if (SAT.testPolygonPolygon(playerPoly, coralPoly, response)) {
-  gameOverSound.play();
   clearInterval(gameLoop);
   gameOver = true;
+  gameOverSound.play();
+
 
   const name = prompt("Game Over! Enter your name:");
-  saveScore(name || "Anonymous", score);
+saveScore(name || "Anonymous", score);
+updateLeaderboard(); 
+
 
   setTimeout(() => location.reload(), 2000); // Optional restart
   return;
@@ -409,33 +420,39 @@ let highScore = localStorage.getItem("highScore") || 0;
 document.getElementById("high-score").textContent = "High Score: " + highScore;
 
 
+import { createClient } from 'https://esm.sh/@supabase/supabase-js';
 
+const supabase = createClient(
+  'https://acgfjifjnglcgkrtuyay.supabase.co',  
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZ2ZqaWZqbmdsY2drcnR1eWF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzMzAyNDgsImV4cCI6MjA2NzkwNjI0OH0.j56rGtp-UFHL0KMxRcJliVoDqVDiP1WyB9liQXfu5Z8'
+);
 
-
-
-
-function saveScore(name, score) {
-  let leaderboard = JSON.parse(localStorage.getItem("leaderboard") || "[]");
-
-  leaderboard.push({ name, score });
-
-  leaderboard.sort((a, b) => b.score - a.score);
-  leaderboard = leaderboard.slice(0, 5); // Top 5
-
-  localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
-  updateLeaderboard();
+async function saveScore(name, score) {
+  const { error } = await supabase.from('Leaderboard').insert([{ name, score }]);
+  if (error) console.error("Failed to save score:", error);
 }
 
-function updateLeaderboard() {
+async function updateLeaderboard() {
+  const { data, error } = await supabase
+    .from('Leaderboard')  
+    .select('*')
+    .order('score', { ascending: false })
+    .limit(5);
+
   const list = document.getElementById("leaderboard-list");
   list.innerHTML = "";
 
-  const leaderboard = JSON.parse(localStorage.getItem("leaderboard") || "[]");
-  leaderboard.forEach(entry => {
+  if (error) {
+    console.error("Failed to load leaderboard:", error);
+    return;
+  }
+
+  data.forEach(entry => {
     const li = document.createElement("li");
     li.textContent = `${entry.name}: ${entry.score}`;
     list.appendChild(li);
   });
 }
 
-updateLeaderboard(); 
+
+updateLeaderboard();
