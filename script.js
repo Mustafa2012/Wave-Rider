@@ -4,7 +4,6 @@ const wavePath = document.getElementById("wave-path");
 
 const jumpSound = new Audio("jump.wav");
 const splashSound = new Audio("splash.wav");
-const scoreSound = new Audio("score.mp3");
 const gameOverSound = new Audio("gameover.wav");
 const backgroundMusic = new Audio("background.wav");
 backgroundMusic.loop = true;         
