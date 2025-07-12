@@ -7,7 +7,7 @@ const splashSound = new Audio("splash.wav");
 const gameOverSound = new Audio("gameover.wav");
 const backgroundMusic = new Audio("background.wav");
 backgroundMusic.loop = true;         
-backgroundMusic.volume = 0.3;        
+backgroundMusic.volume = 0.8;        
 
 
 
