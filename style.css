@@ -1,10 +1,9 @@
 body {
   margin: 0;
   overflow: hidden;
-  background: linear-gradient(to top, #87ceeb, #ffffff);
-  font-family: sans-serif;
+  background: linear-gradient(to top, #1e1e2f, #2b2d42);
+  transition: background 0.3s;
 }
-
 .game {
   position: relative;
   width: 100vw;
@@ -229,3 +228,18 @@ body {
 
 
 
+.lightning-bolt {
+  stroke: #d1b1eb;
+  stroke-width: 3;
+  fill: none;
+  opacity: 0;
+  animation: flash 0.4s ease-out forwards;
+  filter: drop-shadow(0 0 10px rgb(202, 11, 186));
+}
+
+@keyframes flash {
+  0%   { opacity: 0; }
+  10%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}

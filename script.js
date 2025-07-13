@@ -74,13 +74,13 @@ function jump() {
     
     if (upInterval) clearInterval(upInterval);
     if (downInterval) clearInterval(downInterval);
-    startFall(parseInt(player.style.bottom) || 60, true); // true = slam
+    startFall(parseInt(player.style.bottom) || 60, true); 
   }
 }
 
 function startFall(startPos, slam = false) {
   let position = startPos;
-  const fallSpeed = slam ? 700 : 1500;
+  const fallSpeed = slam ? 1 : 2000;
 
  let downInterval = setInterval(() => {
   const waveY = getWaveYAtPlayer();
@@ -319,10 +319,20 @@ function createObstacle() {
   obstacle.style.left = `${window.innerWidth}px`;
   obstacle.style.bottom = `${type.bottom}px`;
   obstacle.style.backgroundImage = `url(${type.image})`;
+  obstacle.style.backgroundSize = "contain";
+  obstacle.style.backgroundRepeat = "no-repeat";
 
-  container.appendChild(obstacle);
+  
+  const img = new Image();
+  img.src = type.image;
+  img.onload = () => {
+    container.appendChild(obstacle);
+    activeObstacles.push({ el: obstacle, x: window.innerWidth });
+  };
+
   return obstacle;
 }
+
 
 let activeObstacles = [];
 
@@ -356,10 +366,7 @@ function moveObstacles() {
     obj.x -= speed;
     obj.el.style.left = `${obj.x}px`;
 
-    if (obj.x < -200) {
-      obj.el.remove();
-      activeObstacles.splice(index, 1);
-    }
+    
   });
 
   requestAnimationFrame(moveObstacles);
@@ -456,3 +463,39 @@ async function updateLeaderboard() {
 
 
 updateLeaderboard();
+
+
+
+function generateLightningBolt() {
+  const container = document.getElementById("lightning-container");
+
+  const startX = Math.random() * window.innerWidth;
+  const startY = 0;
+  const bolt = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+  let path = `M ${startX},${startY}`;
+  let x = startX;
+  let y = startY;
+  const segments = 10;
+  const segmentLength = 40 + Math.random() * 20;
+
+  for (let i = 0; i < segments; i++) {
+    x += (Math.random() - 0.5) * 40; // Zigzag
+    y += segmentLength;
+    path += ` L ${x},${y}`;
+  }
+
+  bolt.setAttribute("d", path);
+  bolt.classList.add("lightning-bolt");
+
+  container.appendChild(bolt);
+
+  setTimeout(() => bolt.remove(), 500); 
+}
+
+
+setInterval(() => {
+  if (Math.random() < 0.6) {
+    generateLightningBolt();
+  }
+}, 4000);
